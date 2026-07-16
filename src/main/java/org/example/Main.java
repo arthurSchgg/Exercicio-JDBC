@@ -138,11 +138,19 @@ public class Main {
 
             System.out.println("""
                 Deseja continuar buscando IDs? 
-                [1] Sim 
+                [1] Sim     
                 [2] Não
                 Escolha uma opção: """);
                 op = SC.nextInt();
                 
         } while(op == 1);
+
+        var contatoDao = new ContatoDao();
+
+        try{
+            System.out.println(contatoDao.listarPorVariosIDs(listaIDs));
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 }

@@ -100,20 +100,40 @@ public class ContatoDao {
         }
     }
 
-    public String listarPorVariosIDs(List<Integer> listaIDs) throws SQLException {
-        var lista
+    public StringBuilder listarPorVariosIDs(List<Integer> listaIDs) throws SQLException {
+        StringBuilder placeholders = new StringBuilder();
+        for(int i = 0; i < listaIDs.size(); i++){
+            placeholders.append("?");
+            if(i < listaIDs.size() - 1){
+                placeholders.append(", ");
+            }
+        }
         String  command = """
                 SELECT nome,
                 numero
                 FROM contatos
                 WHERE 
-                id IN (?, ?)
-                """;
-        List<
+                id IN (%s)
+                """.formatted(placeholders);
         try(Connection conn = ConnectionFactory.conectar();
             PreparedStatement stmt = conn.prepareStatement(command)){
+                int i = 1;
+                for(int id : listaIDs){
+                    stmt.setInt(i, id);
+                    i++;
+                }
 
+                ResultSet rs = stmt.executeQuery();
+                var listaContatos = new StringBuilder();
+
+                while(rs.next()){
+                    String nome = rs.getString("nome");
+                    String numero = rs.getString("numero");
+
+                    Contato contato = new Contato(nome, numero);
+                    listaContatos.append(contato).append("\n");
+                }
+                return listaContatos;
             }
-
     }
 }
