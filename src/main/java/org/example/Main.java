@@ -14,6 +14,10 @@ public class Main {
     }
 
     public static void inicio() {
+        int opcao;
+
+        do {
+            
         System.out.println("""
                 -----Lista de Contatos-----
                 1 - Cadastrar contato
@@ -21,39 +25,46 @@ public class Main {
                 3 - Listar contato
                 4 - Buscar por nome
                 5 - Listar por vários IDs
+                0 - Sair
                 Escolha uma opção:""");
-        int opcao = SC.nextInt();
+        opcao = SC.nextInt();
         SC.nextLine();
 
-        switch (opcao) {
-            case 1: {
-                cadastrarContato();
-                break;
-            }
+            switch (opcao) {
+                case 1: {
+                    cadastrarContato();
+                    break;
+                }
+    
+                case 2: {
+                    editarContato();
+                    break;
+                }
+    
+                case 3: {
+                    listarContatos();
+                    break;
+                }
+    
+                case 4: {
+                    buscarContatoPorNome();
+                    break;
+                }
+    
+                case 5: {
+                    listarPorVariosIDs();
+                    break;
+                }
 
-            case 2: {
-                editarContato();
-                break;
+                case 0: {
+                    System.out.println("Saindo...");
+                    break;
+                }
+    
+                default:
+                    throw new AssertionError();
             }
-
-            case 3: {
-                listarContatos();
-                break;
-            }
-
-            case 4: {
-                buscarContatoPorNome();
-                break;
-            }
-
-            case 5: {
-                listarPorVariosIDs();
-                break;
-            }
-
-            default:
-                throw new AssertionError();
-        }
+        } while(opcao != 0);
     }
 
     public static void cadastrarContato() {
