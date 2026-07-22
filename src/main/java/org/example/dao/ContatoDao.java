@@ -74,7 +74,8 @@ public class ContatoDao {
 
     public StringBuilder buscarContatoPorNome(String nome) throws SQLException {
         String command = """
-                SELECT nome,
+                SELECT id,
+                nome,
                 numero
                 FROM contatos
                 WHERE
@@ -93,7 +94,7 @@ public class ContatoDao {
             Contato contato = null;
 
             while (rs.next()) {
-                contato = new Contato(rs.getString("nome"), rs.getString("numero"));
+                contato = new Contato(rs.getInt("id"), rs.getString("nome"), rs.getString("numero"));
                 listaContatos.append(contato).append("\n");
             }
             return listaContatos;
@@ -102,38 +103,44 @@ public class ContatoDao {
 
     public StringBuilder listarPorVariosIDs(List<Integer> listaIDs) throws SQLException {
         StringBuilder placeholders = new StringBuilder();
-        for(int i = 0; i < listaIDs.size(); i++){
+        for (int i = 0; i < listaIDs.size(); i++) {
             placeholders.append("?");
-            if(i < listaIDs.size() - 1){
+            if (i < listaIDs.size() - 1) {
                 placeholders.append(", ");
             }
         }
-        String  command = """
-                SELECT nome,
-                numero
-                FROM contatos
-                WHERE 
-                id IN (%s)
-                """.formatted(placeholders);
-        try(Connection conn = ConnectionFactory.conectar();
-            PreparedStatement stmt = conn.prepareStatement(command)){
-                int i = 1;
-                for(int id : listaIDs){
-                    stmt.setInt(i, id);
-                    i++;
-                }
+        String command = """
+                    SELECT id,
+                    nome,
+                    numero
+                    FROM contatos
+                    WHERE
+                    id IN (%s)
+                """.formatted(placeholders); /*
+                                              * .formatted(placeholders) é para os ? que no caso são os IDs que o usuário
+                                              * irá inserir, onde o (placeholders) é os "inputs" do usuário.
+                                              */
 
-                ResultSet rs = stmt.executeQuery();
-                var listaContatos = new StringBuilder();
-
-                while(rs.next()){
-                    String nome = rs.getString("nome");
-                    String numero = rs.getString("numero");
-
-                    Contato contato = new Contato(nome, numero);
-                    listaContatos.append(contato).append("\n");
-                }
-                return listaContatos;
+        try (Connection conn = ConnectionFactory.conectar();
+                PreparedStatement stmt = conn.prepareStatement(command)) {
+            int i = 1;
+            for (int id : listaIDs) {
+                stmt.setInt(i, id);
+                i++;
             }
+
+            ResultSet rs = stmt.executeQuery();
+            var listaContatos = new StringBuilder();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome");
+                String numero = rs.getString("numero");
+
+                Contato contato = new Contato(id, nome, numero);
+                listaContatos.append(contato).append("\n");
+            }
+            return listaContatos;
+        }
     }
 }
